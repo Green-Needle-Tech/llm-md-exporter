@@ -28,7 +28,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function getActiveTab() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    // 1. Try active tab in current window
+    let tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    let tab = tabs && tabs.length ? tabs[0] : null;
+
+    // 2. If tab is an extension popup/internal page, look for last focused window's active tab
+    if (!tab || (tab.url && (tab.url.startsWith('chrome-extension://') || tab.url.startsWith('chrome://')))) {
+      const activeTabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      if (activeTabs && activeTabs.length) {
+        tab = activeTabs[0];
+      }
+    }
+
+    // 3. Fallback: find any regular web tab
+    if (!tab || (tab.url && (tab.url.startsWith('chrome-extension://') || tab.url.startsWith('chrome://')))) {
+      const allTabs = await chrome.tabs.query({});
+      tab = allTabs.find((t) => t.url && !t.url.startsWith('chrome-extension://') && !t.url.startsWith('chrome://') && !t.url.startsWith('about:'));
+    }
+
     return tab;
   }
 
@@ -77,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const tab = await getActiveTab();
     if (!tab || !tab.id) {
-      previewEl.value = 'Unable to access current tab.';
+      previewEl.value = 'Unable to access active tab.';
       showStatus('No active web tab detected.', true);
       return;
     }

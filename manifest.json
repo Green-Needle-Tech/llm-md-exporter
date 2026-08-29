@@ -1,14 +1,18 @@
 {
   "manifest_version": 3,
   "name": "ContextMark - Web to LLM Markdown",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Extract clean, LLM-optimized Markdown from any webpage for AI prompts.",
   "permissions": [
+    "tabs",
     "activeTab",
     "scripting",
     "contextMenus",
     "clipboardWrite",
     "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "content_scripts": [
     {
