@@ -12,7 +12,7 @@
   }
   window.__CONTEXTMARK_INJECTED__ = true;
 
-  function initTurndown() {
+  function initTurndown(baseUri) {
     if (typeof TurndownService === 'undefined') {
       console.error('[ContextMark] TurndownService not found in context.');
       return null;
@@ -20,43 +20,70 @@
 
     const turndownService = new TurndownService({
       headingStyle: 'atx',
+      hr: '---',
+      bulletListMarker: '-',
       codeBlockStyle: 'fenced',
       emDelimiter: '*'
     });
 
-    // Use GFM Plugin if available
+    // Use GFM Plugin if available for tables, strikethroughs, and tasklists
     if (typeof turndownPluginGfm !== 'undefined' && turndownPluginGfm.gfm) {
       turndownService.use(turndownPluginGfm.gfm);
     }
 
-    // Convert relative URLs to absolute & strip base64 data URIs
+    // Custom Rule: Absolute URLs and strip base64 image bloat
     turndownService.addRule('absolute-urls', {
       filter: ['a', 'img'],
       replacement: function (content, node) {
-        if (node.tagName === 'A') {
+        const uri = baseUri || document.baseURI || window.location.href;
+        const tag = (node.nodeName || node.tagName || '').toUpperCase();
+
+        if (tag === 'A') {
           const href = node.getAttribute('href');
-          if (!href) return content;
+          if (!href || href.startsWith('javascript:')) return content;
           try {
-            const absoluteHref = new URL(href, document.baseURI).href;
+            const absoluteHref = new URL(href, uri).href;
             return `[${content}](${absoluteHref})`;
           } catch (e) {
             return `[${content}](${href})`;
           }
         }
-        if (node.tagName === 'IMG') {
+
+        if (tag === 'IMG') {
           const src = node.getAttribute('src');
           const alt = node.getAttribute('alt') || '';
           if (!src || src.startsWith('data:')) {
-            return ''; // Strip base64 or empty sources
+            return ''; // Strip base64 data URIs to conserve LLM tokens
           }
           try {
-            const absoluteSrc = new URL(src, document.baseURI).href;
+            const absoluteSrc = new URL(src, uri).href;
             return `![${alt}](${absoluteSrc})`;
           } catch (e) {
             return `![${alt}](${src})`;
           }
         }
+
         return '';
+      }
+    });
+
+    // Custom Rule: Preserve code block syntax highlighting language on <pre> or <code>
+    turndownService.addRule('fencedCodeBlockWithLang', {
+      filter: function (node, options) {
+        return (
+          options.codeBlockStyle === 'fenced' &&
+          (node.nodeName === 'PRE' || node.tagName === 'PRE') &&
+          node.firstChild &&
+          (node.firstChild.nodeName === 'CODE' || node.firstChild.nodeName === '#text')
+        );
+      },
+      replacement: function (content, node, options) {
+        const codeNode = node.querySelector ? node.querySelector('code') || node : node;
+        const className = (node.getAttribute('class') || '') + ' ' + (codeNode.getAttribute('class') || '');
+        const match = className.match(/(?:lang|language)-([a-zA-Z0-9_+-]+)/i);
+        const language = match ? match[1] : '';
+        const code = codeNode.textContent || node.textContent || '';
+        return '\n\n```' + language + '\n' + code.replace(/\n+$/, '') + '\n```\n\n';
       }
     });
 
@@ -80,7 +107,8 @@
     let contentHtml = '';
     let title = document.title || 'Untitled Page';
     const pageUrl = window.location.href;
-    const turndownService = initTurndown();
+    const baseUri = document.baseURI || pageUrl;
+    const turndownService = initTurndown(baseUri);
 
     if (!turndownService) {
       throw new Error('Turndown conversion service failed to initialize.');
@@ -96,13 +124,12 @@
           title,
           url: pageUrl,
           markdown: '',
-          rawBody: '',
+          bodyMarkdown: '',
           estimatedTokens: 0,
           error: 'No text selected on the page.'
         };
       }
 
-      // If selection exists, grab its HTML fragment if possible for formatting
       let selectionHtml = '';
       if (selection.rangeCount > 0) {
         const container = document.createElement('div');
@@ -137,10 +164,14 @@
     // 2. Full Clean Page Scope (Readability)
     if (options.scope === 'clean') {
       let readabilitySuccess = false;
-      if (typeof Readability !== 'undefined') {
+      const ReadabilityClass = (typeof Readability !== 'undefined' && Readability.Readability)
+        ? Readability.Readability
+        : (typeof Readability === 'function' ? Readability : null);
+
+      if (ReadabilityClass) {
         try {
           const documentClone = document.cloneNode(true);
-          const article = new Readability(documentClone).parse();
+          const article = new ReadabilityClass(documentClone).parse();
           if (article && article.content) {
             contentHtml = article.content;
             title = article.title || title;

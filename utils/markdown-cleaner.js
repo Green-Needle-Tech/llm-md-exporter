@@ -21,16 +21,18 @@
     return markdown
       // Normalize CRLF to LF
       .replace(/\r\n/g, '\n')
-      // Remove zero-width characters and unusual whitespace
+      // Remove zero-width characters and unusual Unicode invisible chars
       .replace(/[\u200B-\u200D\uFEFF]/g, '')
       // Remove data: URLs (such as base64 images that bypassed initial filter)
-      .replace(/!\[(.*?)\]\(data:image\/[a-zA-Z]+;base64,[^)]+\)/g, '')
-      // Remove trailing whitespace on lines
-      .replace(/[ \t]+$/gm, '')
-      // Normalize excessive empty lines (3+ newlines to 2)
-      .replace(/\n{3,}/g, '\n\n')
-      // Remove empty markdown links like [](url) or [   ](url)
+      .replace(/!\[(.*?)\]\(data:image\/[a-zA-Z0-9+.\/-]+;base64,[^)]+\)/g, '')
+      // Remove empty or whitespace-only links like [](url) or [   ](url)
       .replace(/\[\s*\]\([^)]+\)/g, '')
+      // Remove duplicate empty headings (e.g. # \n or ## \n)
+      .replace(/^#{1,6}\s*$/gm, '')
+      // Trim trailing whitespace on lines
+      .replace(/[ \t]+$/gm, '')
+      // Normalize excessive empty lines (3+ newlines down to 2)
+      .replace(/\n{3,}/g, '\n\n')
       // Trim overall text
       .trim();
   }
