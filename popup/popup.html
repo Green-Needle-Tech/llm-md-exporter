@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContextMark</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="icon">📑</span>
+        <span class="title">ContextMark</span>
+      </div>
+      <div class="badge" id="token-badge">
+        <span id="token-count">0</span> tokens
+      </div>
+    </header>
+
+    <!-- Scope Selection -->
+    <section class="section">
+      <label class="section-label">Extraction Scope</label>
+      <div class="segmented-control">
+        <label class="segment-btn active" data-scope="clean">
+          <input type="radio" name="scope" value="clean" checked>
+          <span>Full Clean</span>
+        </label>
+        <label class="segment-btn" data-scope="selection">
+          <input type="radio" name="scope" value="selection">
+          <span>Selection</span>
+        </label>
+        <label class="segment-btn" data-scope="raw">
+          <input type="radio" name="scope" value="raw">
+          <span>Raw DOM</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Options -->
+    <section class="section options-grid">
+      <label class="checkbox-label">
+        <input type="checkbox" id="opt-frontmatter" checked>
+        <span>Include Front Matter</span>
+      </label>
+    </section>
+
+    <!-- Markdown Preview (Collapsible) -->
+    <section class="preview-section">
+      <div class="preview-header">
+        <span>Preview</span>
+        <span id="char-count">0 chars</span>
+      </div>
+      <textarea id="markdown-preview" readonly placeholder="Extracting content..."></textarea>
+    </section>
+
+    <!-- Status Message -->
+    <div id="status-bar" class="status-bar hidden"></div>
+
+    <!-- Actions -->
+    <footer class="action-footer">
+      <button id="btn-copy" class="btn btn-primary">
+        <span class="btn-icon">📋</span>
+        <span class="btn-text">Copy Markdown</span>
+      </button>
+      <button id="btn-download" class="btn btn-secondary" title="Download .md file">
+        <span class="btn-icon">💾</span>
+        <span class="btn-text">Download</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="../utils/token-estimator.js"></script>
+  <script src="../utils/markdown-cleaner.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

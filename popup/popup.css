@@ -1,0 +1,229 @@
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --border-color: #334155;
+  --error: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  width: 360px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.badge {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Section */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Segmented Control */
+.segmented-control {
+  display: flex;
+  background-color: var(--bg-secondary);
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.segment-btn {
+  flex: 1;
+  text-align: center;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.segment-btn input {
+  display: none;
+}
+
+.segment-btn.active {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Options */
+.options-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Preview Section */
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+textarea#markdown-preview {
+  width: 100%;
+  height: 140px;
+  background-color: var(--bg-secondary);
+  color: #cbd5e1;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  resize: vertical;
+  outline: none;
+}
+
+textarea#markdown-preview:focus {
+  border-color: var(--accent);
+}
+
+/* Status Bar */
+.status-bar {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: center;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--accent);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.status-bar.error {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--error);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.status-bar.hidden {
+  display: none;
+}
+
+/* Actions */
+.action-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+  flex: 2;
+  background-color: var(--accent);
+  color: #042f2e;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  flex: 1;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
