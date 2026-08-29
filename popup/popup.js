@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     previewEl.value = 'Extracting and optimizing markdown...';
     btnCopy.disabled = true;
     btnDownload.disabled = true;
+    currentExtraction = null; // prevent stale copy/download from a previous page
 
     const tab = await getActiveTab();
     if (!tab || !tab.id) {
@@ -117,12 +118,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (response && response.success && response.data) {
         currentExtraction = response.data;
         updateView();
-        btnCopy.disabled = false;
-        btnDownload.disabled = false;
+        btnCopy.disabled = !getMarkdownOutput();
+        btnDownload.disabled = !getMarkdownOutput();
+        if (!getMarkdownOutput()) {
+          showStatus('No content extracted — try selecting text or Raw DOM scope.', true, 4000);
+        }
       } else {
         const errMsg = response && response.error ? response.error : 'Unknown extraction error';
-        previewEl.value = `Error: ${errMsg}`;
-        showStatus(errMsg, true);
+        // Empty body (e.g. Selection scope with nothing highlighted) is not an error
+        currentExtraction = response && response.success ? response.data : null;
+        previewEl.value = response && response.success ? '' : `Error: ${errMsg}`;
+        showStatus(errMsg, !!(response && response.success), 3000);
       }
     } catch (err) {
       previewEl.value = `Error: ${err.message || String(err)}`;

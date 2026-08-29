@@ -234,6 +234,18 @@
 
     // 2. Full Clean Page Scope (Readability)
     if (options.scope === 'clean') {
+      // Wait for the page to finish loading before extracting, so Readability
+      // never runs against a half-loaded DOM (which yields empty/wrong content).
+      if (document.readyState !== 'complete') {
+        try {
+          await new Promise((resolve) => {
+            if (document.readyState === 'complete') return resolve();
+            window.addEventListener('load', resolve, { once: true });
+            setTimeout(resolve, 3000); // do not hang forever
+          });
+        } catch (e) { /* proceed with what we have */ }
+      }
+
       let readabilitySuccess = false;
       const ReadabilityClass = (typeof Readability !== 'undefined' && Readability.Readability)
         ? Readability.Readability
