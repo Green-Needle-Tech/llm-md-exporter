@@ -4,15 +4,7 @@
  * calibrated against common LLM tokenizers (tiktoken / cl100k_base / Llama 3).
  */
 
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define([], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
-  } else {
-    root.TokenEstimator = factory();
-  }
-}(typeof self !== 'undefined' ? self : this, function () {
+(function (global) {
   'use strict';
 
   function estimateTokens(text) {
@@ -55,8 +47,14 @@
     return count.toString();
   }
 
-  return {
+  const TokenEstimator = {
     estimateTokens: estimateTokens,
     formatTokenCount: formatTokenCount
   };
-}));
+
+  global.TokenEstimator = TokenEstimator;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = TokenEstimator;
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : this)));

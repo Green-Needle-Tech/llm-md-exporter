@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ContextMark - Web to LLM Markdown",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Extract clean, LLM-optimized Markdown from any webpage for AI prompts.",
   "permissions": [
     "activeTab",
@@ -9,6 +9,20 @@
     "contextMenus",
     "clipboardWrite",
     "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/readability.js",
+        "lib/turndown.js",
+        "lib/turndown-plugin-gfm.js",
+        "utils/token-estimator.js",
+        "utils/markdown-cleaner.js",
+        "scripts/content.js"
+      ],
+      "run_at": "document_idle"
+    }
   ],
   "action": {
     "default_popup": "popup/popup.html",

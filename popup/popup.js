@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Ignore restricted URLs
-    if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('edge://'))) {
+    if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('edge://') || tab.url.startsWith('about:'))) {
       previewEl.value = 'Cannot extract from browser internal pages.';
       showStatus('Internal browser page.', true);
       return;

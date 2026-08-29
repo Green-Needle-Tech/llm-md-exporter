@@ -41,6 +41,12 @@ body {
   padding-bottom: 10px;
 }
 
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -48,6 +54,16 @@ body {
   font-weight: 700;
   font-size: 15px;
   color: var(--text-primary);
+}
+
+.version-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-tertiary);
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.2;
 }
 
 .badge {

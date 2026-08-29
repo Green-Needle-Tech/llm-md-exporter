@@ -2,15 +2,7 @@
  * Markdown Cleaner & LLM Post-Processing Utility
  */
 
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define([], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
-  } else {
-    root.MarkdownCleaner = factory();
-  }
-}(typeof self !== 'undefined' ? self : this, function () {
+(function (global) {
   'use strict';
 
   function sanitizeMarkdown(markdown) {
@@ -55,8 +47,14 @@
     return fm;
   }
 
-  return {
+  const MarkdownCleaner = {
     sanitizeMarkdown: sanitizeMarkdown,
     generateFrontMatter: generateFrontMatter
   };
-}));
+
+  global.MarkdownCleaner = MarkdownCleaner;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = MarkdownCleaner;
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : this)));
