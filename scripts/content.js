@@ -57,7 +57,14 @@
         const isFirst = !node.previousElementSibling;
         const cleanContent = (content || '').trim().replace(/\n+/g, ' ').replace(/\|/g, '\\|');
         const prefix = isFirst ? '| ' : ' ';
-        return prefix + cleanContent + ' |';
+        // colspan support: emit the cell once per spanned column so every
+        // markdown row keeps a consistent column count and the table renders.
+        let out = prefix + cleanContent + ' |';
+        const span = parseInt(node.getAttribute('colspan') || '1', 10);
+        if (span > 1) {
+          for (let i = 1; i < span; i++) out += ' |';
+        }
+        return out;
       }
     });
 
@@ -67,8 +74,17 @@
         let borderCells = '';
         if (isFirstTableRow(node)) {
           const cells = node.querySelectorAll('th, td');
+          // Compute total column count honouring colspan on header cells.
+          let cols = 0;
           for (let i = 0; i < cells.length; i++) {
-            const align = (cells[i].getAttribute('align') || '').toLowerCase();
+            const span = parseInt(cells[i].getAttribute('colspan') || '1', 10) || 1;
+            cols += span;
+          }
+          // Determine column count from the widest row in the table when the
+          // first row is a colspan-only header (edge case).
+          if (!cols) cols = 1;
+          for (let i = 0; i < cols; i++) {
+            const align = (cells[i] ? (cells[i].getAttribute('align') || '').toLowerCase() : '');
             const border = alignMap[align] || '---';
             const prefix = i === 0 ? '| ' : ' ';
             borderCells += prefix + border + ' |';

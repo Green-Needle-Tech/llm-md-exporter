@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html><head><title>Table Test</title></head>
+<body>
+<article>
+<h1>Table Conversion Test</h1>
+
+<h2>Standard thead table</h2>
+<table>
+  <thead><tr><th>Engine</th><th>Throughput</th><th>TTFT</th></tr></thead>
+  <tbody>
+    <tr><td>vLLM</td><td>1420</td><td>45</td></tr>
+    <tr><td>TGI</td><td>1150</td><td>52</td></tr>
+  </tbody>
+</table>
+
+<h2>Plain table, no thead</h2>
+<table>
+  <tr><td>Alpha</td><td>Beta</td></tr>
+  <tr><td>1</td><td>2</td></tr>
+</table>
+
+<h2>Table with colspan</h2>
+<table>
+  <thead><tr><th>Name</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td colspan="2">spanning cell</td></tr>
+    <tr><td>x</td><td>y</td></tr>
+  </tbody>
+</table>
+
+<h2>Nested / markup in cells</h2>
+<table>
+  <thead><tr><th>Feature</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bold</strong> text</td><td><a href="/ok">link</a></td></tr>
+    <tr><td>pipe | inside</td><td>multi<br>line</td></tr>
+  </tbody>
+</table>
+
+</article>
+</body></html>
