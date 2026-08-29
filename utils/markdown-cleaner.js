@@ -5,12 +5,26 @@
 (function (global) {
   'use strict';
 
+  function stripRemainingHtml(text) {
+    if (!text || typeof text !== 'string') return '';
+    // Strip HTML tags ONLY outside fenced code blocks and inline code
+    const parts = text.split(/(```[\s\S]*?```|`[^`\n]*`)/g);
+    for (let i = 0; i < parts.length; i++) {
+      // Even indices are plain text outside code
+      if (i % 2 === 0) {
+        // Replace HTML tags like <div>, </p>, <span class="..."> with empty string
+        parts[i] = parts[i].replace(/<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:\s+[^>]*)?>/g, '');
+      }
+    }
+    return parts.join('');
+  }
+
   function sanitizeMarkdown(markdown) {
     if (!markdown || typeof markdown !== 'string') {
       return '';
     }
 
-    return markdown
+    let cleaned = markdown
       // Normalize CRLF to LF
       .replace(/\r\n/g, '\n')
       // Remove zero-width characters and unusual Unicode invisible chars
@@ -22,7 +36,12 @@
       // Remove duplicate empty headings (e.g. # \n or ## \n)
       .replace(/^#{1,6}\s*$/gm, '')
       // Trim trailing whitespace on lines
-      .replace(/[ \t]+$/gm, '')
+      .replace(/[ \t]+$/gm, '');
+
+    // Convert any remaining raw HTML tags to clean markdown text outside code blocks
+    cleaned = stripRemainingHtml(cleaned);
+
+    return cleaned
       // Normalize excessive empty lines (3+ newlines down to 2)
       .replace(/\n{3,}/g, '\n\n')
       // Trim overall text
@@ -49,7 +68,8 @@
 
   const MarkdownCleaner = {
     sanitizeMarkdown: sanitizeMarkdown,
-    generateFrontMatter: generateFrontMatter
+    generateFrontMatter: generateFrontMatter,
+    stripRemainingHtml: stripRemainingHtml
   };
 
   global.MarkdownCleaner = MarkdownCleaner;

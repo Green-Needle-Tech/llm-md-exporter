@@ -31,6 +31,77 @@
       turndownService.use(turndownPluginGfm.gfm);
     }
 
+    // Override keepReplacement so unhandled elements convert inner content instead of preserving raw HTML
+    turndownService.options.keepReplacement = function (content, node) {
+      return node.isBlock ? '\n\n' + content + '\n\n' : content;
+    };
+
+    // Table conversion rule supporting both thead/th and plain tr/td structures
+    const alignMap = { left: ':--', right: '--:', center: ':-:' };
+
+    function isFirstTableRow(node) {
+      const parentNode = node.parentNode;
+      if (!parentNode) return false;
+      if (parentNode.nodeName === 'THEAD' || parentNode.nodeName === 'TABLE') {
+        return !node.previousElementSibling;
+      }
+      if (parentNode.nodeName === 'TBODY') {
+        return !node.previousElementSibling && (!parentNode.previousElementSibling || parentNode.previousElementSibling.nodeName !== 'THEAD');
+      }
+      return false;
+    }
+
+    turndownService.addRule('gfmTableCells', {
+      filter: ['th', 'td'],
+      replacement: function (content, node) {
+        const isFirst = !node.previousElementSibling;
+        const cleanContent = (content || '').trim().replace(/\n+/g, ' ').replace(/\|/g, '\\|');
+        const prefix = isFirst ? '| ' : ' ';
+        return prefix + cleanContent + ' |';
+      }
+    });
+
+    turndownService.addRule('gfmTableRows', {
+      filter: 'tr',
+      replacement: function (content, node) {
+        let borderCells = '';
+        if (isFirstTableRow(node)) {
+          const cells = node.querySelectorAll('th, td');
+          for (let i = 0; i < cells.length; i++) {
+            const align = (cells[i].getAttribute('align') || '').toLowerCase();
+            const border = alignMap[align] || '---';
+            const prefix = i === 0 ? '| ' : ' ';
+            borderCells += prefix + border + ' |';
+          }
+        }
+        return '\n' + content + (borderCells ? '\n' + borderCells : '');
+      }
+    });
+
+    turndownService.addRule('gfmTables', {
+      filter: 'table',
+      replacement: function (content) {
+        const cleanTable = (content || '').replace(/\n\n+/g, '\n').trim();
+        return '\n\n' + cleanTable + '\n\n';
+      }
+    });
+
+    // Custom Rule: Underline and inserted text
+    turndownService.addRule('underlineAndIns', {
+      filter: ['u', 'ins'],
+      replacement: function (content) {
+        return content.trim() ? '_' + content + '_' : '';
+      }
+    });
+
+    // Custom Rule: Inline quotation tags
+    turndownService.addRule('inlineQuotes', {
+      filter: 'q',
+      replacement: function (content) {
+        return '"' + content + '"';
+      }
+    });
+
     // Custom Rule: Absolute URLs and strip base64 image bloat
     turndownService.addRule('absolute-urls', {
       filter: ['a', 'img'],
